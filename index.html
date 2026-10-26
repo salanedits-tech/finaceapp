@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ماہانہ مالیاتی حساب کتاب - Monthly Finance Tracker</title>
     
+    <!-- PWA Web App Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -470,13 +473,11 @@
             let csvContent = "Date,Type,Title,Category,Amount (PKR)\n";
 
             records.forEach(r => {
-                // Escape commas or quotes
                 const safeTitle = `"${r.title.replace(/"/g, '""')}"`;
                 const safeCategory = `"${r.category.replace(/"/g, '""')}"`;
                 csvContent += `${r.date},${r.type},${safeTitle},${safeCategory},${r.amount}\n`;
             });
 
-            // \uFEFF ensures MS Excel opens UTF-8 encoded Urdu letters without corrupting them
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -489,6 +490,7 @@
         };
 
         // Month filter event listener
+        monthFilter.value = new Date().toISOString().slice(0, 7);
         monthFilter.addEventListener('change', render);
 
         // App Launch
