@@ -1,0 +1,14 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Finance App",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Finance App",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "edge_side_panel": {
+    "preferred_width": 0
+  }
+}
