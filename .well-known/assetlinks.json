@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.salanedits_tech.twa",
+        "sha256_cert_fingerprints": ["7E:CD:48:2C:9A:6F:13:F6:66:60:08:2B:3D:3C:E7:18:4A:CF:C0:8D:5E:EB:E6:55:A2:FA:A8:23:31:C2:E3:DF"]
+      }
+    }]
