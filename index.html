@@ -1,516 +1,123 @@
 <!DOCTYPE html>
-<html lang="ur" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ماہانہ مالیاتی حساب کتاب - Monthly Finance Tracker</title>
-    
-    <!-- PWA Primary Meta Tags -->
-    <meta name="title" content="Finance App Tracker">
-    <meta name="description" content="A simple and secure monthly financial tracker app designed to easily manage your monthly expenses, income, and track your personal budget.">
-    <meta name="theme-color" content="#059669">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Finance App">
-
-    <!-- Apple iOS / Splash Screen Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Finance App">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/salanedits-tech/finaceapp/main/icon-192.png">
-
-    <!-- Web App Manifest Link -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Finance Tracker</title>
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Favicon & Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/salanedits-tech/finaceapp/main/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/salanedits-tech/finaceapp/main/icon-512.png">
-    
-    <!-- Tailwind CSS CDN -->
+    <meta name="theme-color" content="#ffffff">
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Noto Nastaliq Urdu & Plus Jakarta Sans for English numbers -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        nastaliq: ['"Noto Nastaliq Urdu"', 'serif'],
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            font-family: 'Noto Nastaliq Urdu', serif;
-            -webkit-tap-highlight-color: transparent;
-            background-color: #f8fafc;
-        }
-        .num-font {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            direction: ltr;
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        /* Prevent font clipping */
-        .nastaliq-spacing {
-            line-height: 2.2 !important;
-            padding-top: 4px;
-            padding-bottom: 4px;
-        }
-    </style>
 </head>
-<body class="text-slate-800 min-h-screen pb-16">
+<body class="bg-gray-50 text-gray-800 p-4 max-w-md mx-auto">
+    <h1 class="text-2xl font-bold text-center mb-4">Monthly Finance Tracker</h1>
+    
+    <!-- Summary Cards -->
+    <div class="bg-white p-4 rounded-xl shadow mb-4">
+        <h2 class="text-lg font-semibold text-gray-600">Balance: <span id="balance" class="text-black">Rs. 0</span></h2>
+    </div>
 
-    <!-- TOP HEADER -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 py-3 shadow-sm">
-        <div class="max-w-md mx-auto flex items-center justify-between">
+    <div class="grid grid-cols-3 gap-2 mb-4 text-center">
+        <div class="bg-blue-50 p-2 rounded-lg">
+            <p class="text-xs text-blue-600 font-bold">Savings</p>
+            <p id="total-savings" class="font-bold">Rs. 0</p>
+        </div>
+        <div class="bg-red-50 p-2 rounded-lg">
+            <p class="text-xs text-red-600 font-bold">Expense</p>
+            <p id="total-expense" class="font-bold">Rs. 0</p>
+        </div>
+        <div class="bg-green-50 p-2 rounded-lg">
+            <p class="text-xs text-green-600 font-bold">Income</p>
+            <p id="total-income" class="font-bold">Rs. 0</p>
+        </div>
+    </div>
+
+    <!-- Add Entry Form -->
+    <div class="bg-white p-4 rounded-xl shadow mb-4">
+        <h2 class="font-bold mb-3">Add New Entry</h2>
+        <form id="entry-form" class="space-y-3">
             <div>
-                <h1 class="text-lg md:text-xl font-bold text-slate-900 leading-relaxed">
-                    ماہانہ مالیاتی حساب کتاب
-                </h1>
-                <p class="text-[11px] font-sans font-bold text-slate-400 -mt-1 tracking-wider uppercase">
-                    Monthly Finance Tracker
-                </p>
+                <label class="block text-sm font-medium">Type</label>
+                <select id="type" class="w-full p-2 border rounded-lg">
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Savings">Savings</option>
+                </select>
             </div>
-
-            <!-- Month Filter -->
-            <div class="flex items-center space-x-2 space-x-reverse">
-                <input type="month" id="monthFilter" 
-                       class="num-font text-xs font-bold bg-slate-100 border border-slate-300 text-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer">
+            <div>
+                <label class="block text-sm font-medium">Description / Name</label>
+                <input type="text" id="desc" placeholder="e.g. Salary, Rent, Grocery" class="w-full p-2 border rounded-lg" required>
             </div>
-        </div>
-    </header>
-
-    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
-
-        <!-- 1. LIVE NET PROFIT / LOSS HERO BANNER -->
-        <div id="netCard" class="rounded-3xl p-5 shadow-sm border transition-all duration-300 bg-white">
-            <div class="flex items-center justify-between">
-                <div>
-                    <span id="netBadge" class="text-xs font-bold px-3 py-1 rounded-full inline-block mb-1">
-                        صافی منافع / بچت
-                    </span>
-                    <h2 class="text-xs font-sans font-bold text-slate-400">Net Profit / Loss (ماہانہ بچت)</h2>
-                </div>
-                <div class="text-left">
-                    <p id="netAmount" class="num-font text-2xl md:text-3xl font-black tracking-tight">Rs. 0</p>
-                    <p id="netStatusText" class="text-xs font-bold mt-0.5">متوازن (Balanced)</p>
-                </div>
+            <div>
+                <label class="block text-sm font-medium">Amount (Rs.)</label>
+                <input type="number" id="amount" placeholder="0" class="w-full p-2 border rounded-lg" required>
             </div>
-        </div>
-
-        <!-- 2. VIBRANT 3-COLUMN METRICS (Income, Expense, Savings) -->
-        <div class="grid grid-cols-3 gap-2.5">
-            <!-- Total Income (Green Theme) -->
-            <div class="bg-gradient-to-b from-emerald-50 to-white rounded-2xl p-3 border border-emerald-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <div class="w-3 h-3 rounded-full bg-emerald-500 mb-1"></div>
-                    <span class="text-xs font-bold text-emerald-950 block">کل آمدن</span>
-                    <span class="text-[10px] font-sans font-bold text-emerald-600 block">Total Income</span>
-                </div>
-                <p id="totalIncome" class="num-font text-sm md:text-base font-extrabold text-emerald-600 mt-2">Rs. 0</p>
+            <div>
+                <label class="block text-sm font-medium">Date</label>
+                <input type="date" id="date" class="w-full p-2 border rounded-lg" required>
             </div>
+            <button type="submit" class="w-full bg-black text-white p-2 rounded-lg font-bold">Save Entry</button>
+        </form>
+    </div>
 
-            <!-- Total Expenses (Red Theme) -->
-            <div class="bg-gradient-to-b from-rose-50 to-white rounded-2xl p-3 border border-rose-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <div class="w-3 h-3 rounded-full bg-rose-500 mb-1"></div>
-                    <span class="text-xs font-bold text-rose-950 block">کل اخراجات</span>
-                    <span class="text-[10px] font-sans font-bold text-rose-600 block">Total Expense</span>
-                </div>
-                <p id="totalExpense" class="num-font text-sm md:text-base font-extrabold text-rose-600 mt-2">Rs. 0</p>
-            </div>
+    <!-- History -->
+    <div class="bg-white p-4 rounded-xl shadow">
+        <h2 class="font-bold mb-2">History</h2>
+        <ul id="transaction-list" class="space-y-2 text-sm">
+            <!-- Dynamic items will go here -->
+        </ul>
+    </div>
 
-            <!-- Total Savings (Blue Theme) -->
-            <div class="bg-gradient-to-b from-blue-50 to-white rounded-2xl p-3 border border-blue-200 shadow-sm flex flex-col justify-between">
-                <div>
-                    <div class="w-3 h-3 rounded-full bg-blue-500 mb-1"></div>
-                    <span class="text-xs font-bold text-blue-950 block">بچت / بینک</span>
-                    <span class="text-[10px] font-sans font-bold text-blue-600 block">Total Savings</span>
-                </div>
-                <p id="totalSavings" class="num-font text-sm md:text-base font-extrabold text-blue-600 mt-2">Rs. 0</p>
-            </div>
-        </div>
-
-        <!-- 3. INPUT TRANSACTION FORM -->
-        <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-            <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center justify-between">
-                <span>نیا اندراج شامل کریں</span>
-                <span class="text-xs font-sans font-bold text-slate-400">Add Entry</span>
-            </h3>
-
-            <form id="financeForm" class="space-y-3.5">
-                <!-- Type Selection Tabs -->
-                <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-2xl">
-                    <label class="cursor-pointer">
-                        <input type="radio" name="entryType" value="income" class="peer sr-only">
-                        <div class="text-center py-2 text-xs font-bold rounded-xl transition-all peer-checked:bg-emerald-600 peer-checked:text-white text-slate-600 shadow-sm">
-                            آمدن (Income)
-                        </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="entryType" value="expense" checked class="peer sr-only">
-                        <div class="text-center py-2 text-xs font-bold rounded-xl transition-all peer-checked:bg-rose-600 peer-checked:text-white text-slate-600 shadow-sm">
-                            خرچہ (Expense)
-                        </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="entryType" value="savings" class="peer sr-only">
-                        <div class="text-center py-2 text-xs font-bold rounded-xl transition-all peer-checked:bg-blue-600 peer-checked:text-white text-slate-600 shadow-sm">
-                            بچت (Savings)
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Title & Amount Inputs -->
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">تفصیل / نام (Description)</label>
-                        <input type="text" id="entryTitle" required placeholder="مثلاً: تنخواہ، راشن، گھر کا کرایہ"
-                               class="w-full text-sm font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">رقم / Amount (Rs.)</label>
-                            <input type="number" id="entryAmount" required placeholder="0" min="1"
-                                   class="num-font w-full text-base font-extrabold bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1">تاریخ / Date</label>
-                            <input type="date" id="entryDate" required
-                                   class="num-font w-full text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        </div>
-                    </div>
-
-                    <!-- Category Selector -->
-                    <div id="categoryContainer">
-                        <label class="block text-xs font-bold text-slate-600 mb-1">زمرہ / Category</label>
-                        <select id="entryCategory" class="w-full text-xs font-bold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            <option value="خوراک و راشن (Food)">خوراک و راشن (Food & Grocery)</option>
-                            <option value="یوٹیلیٹی بلز (Bills)">یوٹیلیٹی بلز (Utility Bills)</option>
-                            <option value="مکان کا کرایہ (Rent)">مکان کا کرایہ (House Rent)</option>
-                            <option value="پیٹرول و سفر (Travel)">پیٹرول و سفر (Travel & Fuel)</option>
-                            <option value="تعلیم و فیس (Education)">تعلیم و فیس (Education)</option>
-                            <option value="صحت و ادویات (Medical)">صحت و ادویات (Medical)</option>
-                            <option value="خریداری (Shopping)">خریداری (Shopping)</option>
-                            <option value="بینک ٹرانسفر (Bank/Savings)">بینک ٹرانسفر (Bank Transfer)</option>
-                            <option value="ماہانہ تنخواہ (Salary)">ماہانہ تنخواہ (Salary / Earnings)</option>
-                            <option value="متفرق اخراجات (Other)">متفرق اخراجات (Miscellaneous)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" 
-                        class="w-full bg-slate-900 active:scale-[0.99] text-white font-bold py-3 px-4 rounded-2xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2 space-x-reverse">
-                    <span>محفوظ کریں (Save Entry)</span>
-                </button>
-            </form>
-        </div>
-
-        <!-- 4. MONTHLY RECORDS & ACTIONS (Export to CSV/Excel) -->
-        <div class="space-y-3">
-            <div class="flex items-center justify-between px-1">
-                <div>
-                    <h3 class="text-sm font-bold text-slate-800">
-                        ماہانہ اندراجات (<span id="recordCount" class="num-font text-emerald-600 font-extrabold">0</span>)
-                    </h3>
-                    <p class="text-[10px] font-sans font-bold text-slate-400">Monthly Transactions</p>
-                </div>
-
-                <!-- Export & Clear Buttons -->
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <button onclick="exportToCSV()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 text-xs font-bold py-1.5 px-3 rounded-xl transition-all shadow-sm flex items-center gap-1">
-                        <span>ایکسل فائل</span>
-                        <span class="num-font text-[10px]">(CSV)</span>
-                    </button>
-                    <button onclick="clearCurrentMonthData()" class="text-xs text-rose-500 hover:text-rose-700 font-bold px-2 py-1">
-                        صاف کریں
-                    </button>
-                </div>
-            </div>
-
-            <!-- Transaction Cards Container -->
-            <div id="transactionList" class="space-y-2.5">
-                <!-- Records injected dynamically via JavaScript -->
-            </div>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="hidden text-center py-10 bg-white border border-dashed border-slate-300 rounded-3xl p-6">
-                <div class="w-12 h-12 mx-auto bg-slate-100 rounded-full flex items-center justify-center text-xl text-slate-400 mb-2">
-                    📂
-                </div>
-                <p class="text-sm font-bold text-slate-600">اس مہینے کا کوئی ریکارڈ موجود نہیں ہے</p>
-                <p class="text-xs font-sans text-slate-400 mt-1">No transactions recorded for this month</p>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- APPLICATION LOGIC (Vanilla JS) -->
     <script>
-        const STORAGE_KEY = 'nastaliq_monthly_finance_v2';
-        let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        document.getElementById('date').valueAsDate = new Date();
+        
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
-        // Elements
-        const financeForm = document.getElementById('financeForm');
-        const monthFilter = document.getElementById('monthFilter');
-        const entryDate = document.getElementById('entryDate');
-        const totalIncomeEl = document.getElementById('totalIncome');
-        const totalExpenseEl = document.getElementById('totalExpense');
-        const totalSavingsEl = document.getElementById('totalSavings');
-        const netAmountEl = document.getElementById('netAmount');
-        const netStatusTextEl = document.getElementById('netStatusText');
-        const netBadgeEl = document.getElementById('netBadge');
-        const netCardEl = document.getElementById('netCard');
-        const transactionListEl = document.getElementById('transactionList');
-        const recordCountEl = document.getElementById('recordCount');
-        const emptyStateEl = document.getElementById('emptyState');
-
-        // Initialize default dates
-        function initDates() {
-            const today = new Date();
-            const y = today.getFullYear();
-            const m = String(today.getMonth() + 1).padStart(2, '0');
-            const d = String(today.getDate()).padStart(2, '0');
-
-            entryDate.value = `${y}-${m}-${d}`;
-            monthFilter.value = `${y}-${m}`;
-        }
-
-        // Save data to localStorage
-        function save() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-        }
-
-        // Format Currency in Rs.
-        function formatCurrency(num) {
-            return 'Rs. ' + Math.abs(num).toLocaleString('en-US');
-        }
-
-        // Main Render Function
-        function render() {
-            const activeMonth = monthFilter.value; // Format: "YYYY-MM"
-
-            // Filter by month and sort by date descending
-            const currentRecords = transactions.filter(item => item.date.startsWith(activeMonth))
-                                               .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            let inc = 0;
-            let exp = 0;
-            let sav = 0;
-
-            currentRecords.forEach(item => {
-                const amount = Number(item.amount) || 0;
-                if (item.type === 'income') inc += amount;
-                else if (item.type === 'expense') exp += amount;
-                else if (item.type === 'savings') sav += amount;
-            });
-
-            // Net Calculation: Income minus Expenses
-            const net = inc - exp;
-
-            // Update top cards
-            totalIncomeEl.innerText = formatCurrency(inc);
-            totalExpenseEl.innerText = formatCurrency(exp);
-            totalSavingsEl.innerText = formatCurrency(sav);
-            recordCountEl.innerText = currentRecords.length;
-
-            // Update Net Profit / Loss Banner
-            if (net > 0) {
-                // Profit / Surplus (Green)
-                netCardEl.className = "rounded-3xl p-5 shadow-sm border border-emerald-300 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 transition-all duration-300";
-                netBadgeEl.className = "text-xs font-bold px-3 py-1 rounded-full inline-block mb-1 bg-emerald-100 text-emerald-800";
-                netBadgeEl.innerText = "صافی منافع (Surplus / Profit)";
-                netAmountEl.className = "num-font text-2xl md:text-3xl font-black tracking-tight text-emerald-600";
-                netAmountEl.innerText = `+${formatCurrency(net)}`;
-                netStatusTextEl.innerText = "آپ کا بجٹ منافع میں ہے";
-                netStatusTextEl.className = "text-xs font-bold text-emerald-600 mt-0.5";
-            } else if (net < 0) {
-                // Loss / Deficit (Red)
-                netCardEl.className = "rounded-3xl p-5 shadow-sm border border-rose-300 bg-gradient-to-r from-rose-50 via-white to-rose-50 transition-all duration-300";
-                netBadgeEl.className = "text-xs font-bold px-3 py-1 rounded-full inline-block mb-1 bg-rose-100 text-rose-800";
-                netBadgeEl.innerText = "خسارہ / نقصان (Deficit / Loss)";
-                netAmountEl.className = "num-font text-2xl md:text-3xl font-black tracking-tight text-rose-600";
-                netAmountEl.innerText = `-${formatCurrency(net)}`;
-                netStatusTextEl.innerText = "اخراجات آمدن سے بڑھ چکے ہیں";
-                netStatusTextEl.className = "text-xs font-bold text-rose-600 mt-0.5";
-            } else {
-                // Balanced (Slate)
-                netCardEl.className = "rounded-3xl p-5 shadow-sm border border-slate-200 bg-white transition-all duration-300";
-                netBadgeEl.className = "text-xs font-bold px-3 py-1 rounded-full inline-block mb-1 bg-slate-100 text-slate-700";
-                netBadgeEl.innerText = "متوازن (Balanced)";
-                netAmountEl.className = "num-font text-2xl md:text-3xl font-black tracking-tight text-slate-700";
-                netAmountEl.innerText = formatCurrency(0);
-                netStatusTextEl.innerText = "آمدن اور اخراجات برابر ہیں";
-                netStatusTextEl.className = "text-xs font-bold text-slate-500 mt-0.5";
-            }
-
-            // Render Record List
-            transactionListEl.innerHTML = '';
-            if (currentRecords.length === 0) {
-                emptyStateEl.classList.remove('hidden');
-            } else {
-                emptyStateEl.classList.add('hidden');
-                currentRecords.forEach(item => {
-                    const el = buildTransactionCard(item);
-                    transactionListEl.appendChild(el);
-                });
-            }
-        }
-
-        // Build individual item card
-        function buildTransactionCard(item) {
-            const card = document.createElement('div');
-            card.className = "bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between";
-
-            let icon, badgeClass, amountColor, sign;
-            if (item.type === 'income') {
-                icon = '↓';
-                badgeClass = 'bg-emerald-100 text-emerald-800';
-                amountColor = 'text-emerald-600';
-                sign = '+';
-            } else if (item.type === 'expense') {
-                icon = '↑';
-                badgeClass = 'bg-rose-100 text-rose-800';
-                amountColor = 'text-rose-600';
-                sign = '-';
-            } else {
-                icon = '🏦';
-                badgeClass = 'bg-blue-100 text-blue-800';
-                amountColor = 'text-blue-600';
-                sign = '';
-            }
-
-            card.innerHTML = `
-                <div class="flex items-center space-x-3 space-x-reverse">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base ${badgeClass} flex-shrink-0">
-                        ${icon}
-                    </div>
-                    <div class="truncate">
-                        <p class="text-sm font-bold text-slate-900 truncate leading-relaxed">${item.title}</p>
-                        <p class="text-[11px] text-slate-400 font-sans font-semibold">
-                            ${item.date} • <span class="text-slate-600 font-nastaliq">${item.category}</span>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-2 space-x-reverse text-left">
-                    <div class="text-left">
-                        <span class="num-font text-sm md:text-base font-extrabold ${amountColor} block">
-                            ${sign}${formatCurrency(item.amount)}
-                        </span>
-                    </div>
-                    <button onclick="removeTransaction('${item.id}')" 
-                            class="text-slate-300 hover:text-rose-500 p-1.5 text-base font-bold transition-colors">
-                        ✕
-                    </button>
-                </div>
-            `;
-            return card;
-        }
-
-        // Form Submit
-        financeForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const type = document.querySelector('input[name="entryType"]:checked').value;
-            const title = document.getElementById('entryTitle').value.trim();
-            const amount = parseFloat(document.getElementById('entryAmount').value);
-            const date = document.getElementById('entryDate').value;
-            const category = document.getElementById('entryCategory').value;
-
-            if (!title || isNaN(amount) || amount <= 0 || !date) return;
-
-            const newRecord = {
-                id: Date.now().toString(),
-                type,
-                title,
-                amount,
-                date,
-                category
-            };
-
-            transactions.push(newRecord);
-            save();
-
-            // Set filter to newly added item month
-            monthFilter.value = date.substring(0, 7);
-
-            // Clear inputs
-            document.getElementById('entryTitle').value = '';
-            document.getElementById('entryAmount').value = '';
-            
+        function saveAndRender() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
             render();
+        }
+
+        document.getElementById('entry-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const type = document.getElementById('type').value;
+            const desc = document.getElementById('desc').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const date = document.getElementById('date').value;
+
+            transactions.push({ type, desc, amount, date });
+            saveAndRender();
+            this.reset();
+            document.getElementById('date').valueAsDate = new Date();
         });
 
-        // Delete single entry
-        window.removeTransaction = function(id) {
-            if (confirm("کیا آپ واقعی یہ ریکارڈ ڈیلیٹ کرنا چاہتے ہیں؟")) {
-                transactions = transactions.filter(i => i.id !== id);
-                save();
-                render();
-            }
-        };
+        function render() {
+            const list = document.getElementById('transaction-list');
+            list.innerHTML = '';
+            let income = 0, expense = 0, savings = 0;
 
-        // Clear current month entries
-        window.clearCurrentMonthData = function() {
-            const currentMonth = monthFilter.value;
-            if (confirm(`کیا آپ ${currentMonth} کے تمام ریکارڈز صاف کرنا چاہتے ہیں؟`)) {
-                transactions = transactions.filter(i => !i.date.startsWith(currentMonth));
-                save();
-                render();
-            }
-        };
+            transactions.forEach((t, index) => {
+                if(t.type === 'Income') income += t.amount;
+                if(t.type === 'Expense') expense += t.amount;
+                if(t.type === 'Savings') savings += t.amount;
 
-        // Export to Excel / CSV with UTF-8 BOM for Urdu support
-        window.exportToCSV = function() {
-            const activeMonth = monthFilter.value;
-            const records = transactions.filter(item => item.date.startsWith(activeMonth));
-
-            if (records.length === 0) {
-                alert("برآمد کرنے کے لیے اس ماہ کا کوئی ڈیٹا نہیں ہے۔ (No data to export)");
-                return;
-            }
-
-            // CSV Header
-            let csvContent = "Date,Type,Title,Category,Amount (PKR)\n";
-
-            records.forEach(r => {
-                const safeTitle = `"${r.title.replace(/"/g, '""')}"`;
-                const safeCategory = `"${r.category.replace(/"/g, '""')}"`;
-                csvContent += `${r.date},${r.type},${safeTitle},${safeCategory},${r.amount}\n`;
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center border-b pb-1";
+                li.innerHTML = `<span><b>${t.desc}</b> (${t.date}) - Rs. ${t.amount} [${t.type}]</span>
+                                <button onclick="deleteItem(${index})" class="text-red-500 text-xs">Delete</button>`;
+                list.appendChild(li);
             });
 
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Finance_Report_${activeMonth}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
+            document.getElementById('total-income').innerText = 'Rs. ' + income;
+            document.getElementById('total-expense').innerText = 'Rs. ' + expense;
+            document.getElementById('total-savings').innerText = 'Rs. ' + savings;
+            document.getElementById('balance').innerText = 'Rs. ' + (income - expense);
+        }
 
-        // Month filter event listener
-        monthFilter.addEventListener('change', render);
+        function deleteItem(index) {
+            transactions.splice(index, 1);
+            saveAndRender();
+        }
 
-        // App Launch
-        initDates();
         render();
     </script>
 </body>
