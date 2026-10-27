@@ -5,8 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ماہانہ مالیاتی حساب کتاب - Monthly Finance Tracker</title>
     
-    <!-- PWA Web App Manifest Link -->
+    <!-- PWA Primary Meta Tags -->
+    <meta name="title" content="Finance App Tracker">
+    <meta name="description" content="A simple and secure monthly financial tracker app designed to easily manage your monthly expenses, income, and track your personal budget.">
+    <meta name="theme-color" content="#059669">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Finance App">
+
+    <!-- Apple iOS / Splash Screen Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finance App">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/salanedits-tech/finaceapp/main/icon-192.png">
+
+    <!-- Web App Manifest Link -->
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/salanedits-tech/finaceapp/main/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/salanedits-tech/finaceapp/main/icon-512.png">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -490,7 +507,6 @@
         };
 
         // Month filter event listener
-        monthFilter.value = new Date().toISOString().slice(0, 7);
         monthFilter.addEventListener('change', render);
 
         // App Launch
