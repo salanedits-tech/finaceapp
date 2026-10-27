@@ -3,119 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Finance Tracker</title>
+    <title>Personal Finance Tracker</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#4f46e5">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 p-4 max-w-md mx-auto">
-    <h1 class="text-2xl font-bold text-center mb-4">Monthly Finance Tracker</h1>
-    
+<body class="bg-gray-100 text-gray-800 p-4 max-w-xl mx-auto min-h-screen">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-5 bg-indigo-600 text-white p-4 rounded-xl shadow">
+        <div>
+            <h1 class="text-xl font-bold">Finance Tracker</h1>
+            <p class="text-xs text-indigo-200">Offline Personal Manager</p>
+        </div>
+        <button onclick="toggleModal('settings-modal')" class="bg-indigo-700 hover:bg-indigo-800 p-2 rounded-lg text-sm font-semibold">
+            ⚙️ Settings
+        </button>
+    </header>
+
     <!-- Summary Cards -->
-    <div class="bg-white p-4 rounded-xl shadow mb-4">
-        <h2 class="text-lg font-semibold text-gray-600">Balance: <span id="balance" class="text-black">Rs. 0</span></h2>
-    </div>
-
-    <div class="grid grid-cols-3 gap-2 mb-4 text-center">
-        <div class="bg-blue-50 p-2 rounded-lg">
-            <p class="text-xs text-blue-600 font-bold">Savings</p>
-            <p id="total-savings" class="font-bold">Rs. 0</p>
+    <div class="grid grid-cols-3 gap-3 mb-5 text-center">
+        <div class="bg-white p-3 rounded-xl shadow border-t-4 border-green-500">
+            <p class="text-xs font-bold text-gray-500 uppercase">Income</p>
+            <p id="total-income" class="text-base font-extrabold text-green-600">Rs. 0</p>
         </div>
-        <div class="bg-red-50 p-2 rounded-lg">
-            <p class="text-xs text-red-600 font-bold">Expense</p>
-            <p id="total-expense" class="font-bold">Rs. 0</p>
+        <div class="bg-white p-3 rounded-xl shadow border-t-4 border-red-500">
+            <p class="text-xs font-bold text-gray-500 uppercase">Expense</p>
+            <p id="total-expense" class="text-base font-extrabold text-red-600">Rs. 0</p>
         </div>
-        <div class="bg-green-50 p-2 rounded-lg">
-            <p class="text-xs text-green-600 font-bold">Income</p>
-            <p id="total-income" class="font-bold">Rs. 0</p>
+        <div class="bg-white p-3 rounded-xl shadow border-t-4 border-blue-500">
+            <p class="text-xs font-bold text-gray-500 uppercase">Balance</p>
+            <p id="total-balance" class="text-base font-extrabold text-blue-600">Rs. 0</p>
         </div>
     </div>
 
-    <!-- Add Entry Form -->
-    <div class="bg-white p-4 rounded-xl shadow mb-4">
-        <h2 class="font-bold mb-3">Add New Entry</h2>
+    <!-- Category Wise Summary -->
+    <div class="bg-white p-4 rounded-xl shadow mb-5">
+        <h2 class="text-sm font-bold text-gray-700 mb-2">Category Totals (Expenses)</h2>
+        <div id="category-totals" class="flex flex-wrap gap-2 text-xs">
+            <span class="text-gray-400">No data available</span>
+        </div>
+    </div>
+
+    <!-- Entry Form -->
+    <div class="bg-white p-4 rounded-xl shadow mb-5">
+        <h2 id="form-title" class="font-bold text-gray-800 mb-3">Add New Entry</h2>
         <form id="entry-form" class="space-y-3">
-            <div>
-                <label class="block text-sm font-medium">Type</label>
-                <select id="type" class="w-full p-2 border rounded-lg">
-                    <option value="Income">Income</option>
-                    <option value="Expense">Expense</option>
-                    <option value="Savings">Savings</option>
-                </select>
+            <input type="hidden" id="edit-index" value="-1">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Type</label>
+                    <select id="type" class="w-full p-2 border rounded-lg text-sm">
+                        <option value="Expense">Expense</option>
+                        <option value="Income">Income</option>
+                        <option value="Savings">Savings</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Category</label>
+                    <select id="category" class="w-full p-2 border rounded-lg text-sm">
+                        <option value="Food & Grocery">Food & Grocery</option>
+                        <option value="Bills & Utility">Bills & Utility</option>
+                        <option value="Salary / Income">Salary / Income</option>
+                        <option value="Shopping & Clothing">Shopping & Clothing</option>
+                        <option value="Medical & Health">Medical & Health</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
             </div>
             <div>
-                <label class="block text-sm font-medium">Description / Name</label>
-                <input type="text" id="desc" placeholder="e.g. Salary, Rent, Grocery" class="w-full p-2 border rounded-lg" required>
+                <label class="block text-xs font-bold text-gray-600 mb-1">Description</label>
+                <input type="text" id="desc" placeholder="e.g. House Rent, Market Grocery" class="w-full p-2 border rounded-lg text-sm" required>
             </div>
-            <div>
-                <label class="block text-sm font-medium">Amount (Rs.)</label>
-                <input type="number" id="amount" placeholder="0" class="w-full p-2 border rounded-lg" required>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Amount (Rs.)</label>
+                    <input type="number" id="amount" placeholder="0" class="w-full p-2 border rounded-lg text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Date</label>
+                    <input type="date" id="date" class="w-full p-2 border rounded-lg text-sm" required>
+                </div>
             </div>
-            <div>
-                <label class="block text-sm font-medium">Date</label>
-                <input type="date" id="date" class="w-full p-2 border rounded-lg" required>
+            <div class="flex gap-2">
+                <button type="submit" id="submit-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-2.5 rounded-lg text-sm">Save Entry</button>
+                <button type="button" id="cancel-btn" onclick="resetForm()" class="hidden bg-gray-300 text-gray-800 font-bold p-2.5 rounded-lg text-sm">Cancel</button>
             </div>
-            <button type="submit" class="w-full bg-black text-white p-2 rounded-lg font-bold">Save Entry</button>
         </form>
     </div>
 
-    <!-- History -->
+    <!-- History with Search and Filter -->
     <div class="bg-white p-4 rounded-xl shadow">
-        <h2 class="font-bold mb-2">History</h2>
-        <ul id="transaction-list" class="space-y-2 text-sm">
-            <!-- Dynamic items will go here -->
+        <h2 class="font-bold text-gray-800 mb-3">Transaction History</h2>
+        <div class="grid grid-cols-2 gap-2 mb-3">
+            <input type="text" id="search-input" onkeyup="render()" placeholder="Search description..." class="p-2 border rounded-lg text-xs">
+            <input type="month" id="month-filter" onchange="render()" class="p-2 border rounded-lg text-xs">
+        </div>
+        <ul id="transaction-list" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <!-- Dynamic List Items -->
         </ul>
+    </div>
+
+    <!-- Settings & Backup Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-xl max-w-sm w-full p-5 shadow-lg space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-lg">Settings & Data</h3>
+                <button onclick="toggleModal('settings-modal')" class="text-gray-500 hover:text-black text-xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-2">
+                <button onclick="exportCSV()" class="w-full bg-green-600 text-white p-2.5 rounded-lg text-sm font-bold">📥 Export to Excel/CSV</button>
+                <button onclick="backupJSON()" class="w-full bg-blue-600 text-white p-2.5 rounded-lg text-sm font-bold">💾 Download JSON Backup</button>
+                
+                <div class="pt-2">
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Restore Backup (JSON file)</label>
+                    <input type="file" id="restore-file" onchange="restoreJSON(event)" class="w-full text-xs p-2 border rounded-lg">
+                </div>
+            </div>
+            <button onclick="toggleModal('settings-modal')" class="w-full bg-gray-200 p-2 rounded-lg text-sm font-semibold mt-2">Close</button>
+        </div>
     </div>
 
     <script>
         document.getElementById('date').valueAsDate = new Date();
-        
-        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let transactions = JSON.parse(localStorage.getItem('app_transactions')) || [];
+
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
 
         function saveAndRender() {
-            localStorage.setItem('transactions', JSON.stringify(transactions));
+            localStorage.setItem('app_transactions', JSON.stringify(transactions));
             render();
         }
 
         document.getElementById('entry-form').addEventListener('submit', function(e) {
             e.preventDefault();
+            const editIndex = parseInt(document.getElementById('edit-index').value);
             const type = document.getElementById('type').value;
+            const category = document.getElementById('category').value;
             const desc = document.getElementById('desc').value;
             const amount = parseFloat(document.getElementById('amount').value);
             const date = document.getElementById('date').value;
 
-            transactions.push({ type, desc, amount, date });
+            if (editIndex === -1) {
+                transactions.push({ type, category, desc, amount, date });
+            } else {
+                transactions[editIndex] = { type, category, desc, amount, date };
+            }
+
+            resetForm();
             saveAndRender();
-            this.reset();
-            document.getElementById('date').valueAsDate = new Date();
         });
 
         function render() {
             const list = document.getElementById('transaction-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const monthFilter = document.getElementById('month-filter').value;
+            
             list.innerHTML = '';
-            let income = 0, expense = 0, savings = 0;
+            let income = 0, expense = 0;
+            let catTotals = {};
+
+            const filtered = transactions.filter(t => {
+                const matchSearch = t.desc.toLowerCase().includes(search) || t.category.toLowerCase().includes(search);
+                const matchMonth = monthFilter ? t.date.startsWith(monthFilter) : true;
+                return matchSearch && matchMonth;
+            });
+
+            filtered.forEach((t) => {
+                if (t.type === 'Income') income += t.amount;
+                if (t.type === 'Expense') {
+                    expense += t.amount;
+                    catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+                }
+            });
 
             transactions.forEach((t, index) => {
-                if(t.type === 'Income') income += t.amount;
-                if(t.type === 'Expense') expense += t.amount;
-                if(t.type === 'Savings') savings += t.amount;
+                const isVisible = filtered.includes(t);
+                if (!isVisible) return;
 
                 const li = document.createElement('li');
-                li.className = "flex justify-between items-center border-b pb-1";
-                li.innerHTML = `<span><b>${t.desc}</b> (${t.date}) - Rs. ${t.amount} [${t.type}]</span>
-                                <button onclick="deleteItem(${index})" class="text-red-500 text-xs">Delete</button>`;
+                li.className = "flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border text-xs";
+                li.innerHTML = `
+                    <div>
+                        <span class="font-bold text-gray-800">${t.desc}</span> 
+                        <span class="text-gray-400">(${t.category})</span><br>
+                        <span class="text-gray-500">${t.date}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold ${t.type === 'Income' ? 'text-green-600' : 'text-red-600'}">
+                            ${t.type === 'Income' ? '+' : '-'} Rs. ${t.amount}
+                        </span>
+                        <div class="mt-1 space-x-1">
+                            <button onclick="editEntry(${index})" class="text-blue-500 underline font-semibold">Edit</button>
+                            <button onclick="deleteEntry(${index})" class="text-red-500 underline font-semibold">Delete</button>
+                        </div>
+                    </div>
+                `;
                 list.appendChild(li);
             });
 
             document.getElementById('total-income').innerText = 'Rs. ' + income;
             document.getElementById('total-expense').innerText = 'Rs. ' + expense;
-            document.getElementById('total-savings').innerText = 'Rs. ' + savings;
-            document.getElementById('balance').innerText = 'Rs. ' + (income - expense);
+            document.getElementById('total-balance').innerText = 'Rs. ' + (income - expense);
+
+            // Render Category Totals
+            const catContainer = document.getElementById('category-totals');
+            catContainer.innerHTML = '';
+            if (Object.keys(catTotals).length === 0) {
+                catContainer.innerHTML = '<span class="text-gray-400">No expenses recorded</span>';
+            } else {
+                for (let cat in catTotals) {
+                    const badge = document.createElement('span');
+                    badge.className = "bg-red-50 text-red-700 px-2 py-1 rounded-md border border-red-200 font-semibold";
+                    badge.innerText = `${cat}: Rs. ${catTotals[cat]}`;
+                    catContainer.appendChild(badge);
+                }
+            }
         }
 
-        function deleteItem(index) {
-            transactions.splice(index, 1);
-            saveAndRender();
+        function editEntry(index) {
+            const t = transactions[index];
+            document.getElementById('edit-index').value = index;
+            document.getElementById('type').value = t.type;
+            document.getElementById('category').value = t.category;
+            document.getElementById('desc').value = t.desc;
+            document.getElementById('amount').value = t.amount;
+            document.getElementById('date').value = t.date;
+
+            document.getElementById('form-title').innerText = "Edit Entry";
+            document.getElementById('submit-btn').innerText = "Update Entry";
+            document.getElementById('cancel-btn').classList.remove('hidden');
+        }
+
+        function resetForm() {
+            document.getElementById('entry-form').reset();
+            document.getElementById('edit-index').value = -1;
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('form-title').innerText = "Add New Entry";
+            document.getElementById('submit-btn').innerText = "Save Entry";
+            document.getElementById('cancel-btn').classList.add('hidden');
+        }
+
+        function deleteEntry(index) {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                transactions.splice(index, 1);
+                saveAndRender();
+            }
+        }
+
+        function exportCSV() {
+            if (transactions.length === 0) return alert("No transactions to export!");
+            let csv = "Type,Category,Description,Amount,Date\n";
+            transactions.forEach(t => {
+                csv += `"${t.type}","${t.category}","${t.desc}",${t.amount},"${t.date}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Finance_Report.csv';
+            a.click();
+        }
+
+        function backupJSON() {
+            if (transactions.length === 0) return alert("No data to backup!");
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = 'finance_backup.json';
+            a.click();
+        }
+
+        function restoreJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    transactions = JSON.parse(event.target.result);
+                    saveAndRender();
+                    alert("Backup restored successfully!");
+                    toggleModal('settings-modal');
+                } catch (err) {
+                    alert("Invalid JSON file!");
+                }
+            };
+            reader.readAsText(file);
         }
 
         render();
